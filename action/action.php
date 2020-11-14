@@ -29,12 +29,20 @@ class action_plugin_tablelayout_action extends DokuWiki_Action_Plugin
     {
         $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'BEFORE', $this, 'ensurePagesave');
         $controller->register_hook('PLUGIN_EDITTABLE_PREPROCESS_EDITOR', 'AFTER', $this, 'handleTablePost');
+        $controller->register_hook('FORM_EDIT_OUTPUT', 'BEFORE', $this, 'addLayoutField');
         $controller->register_hook('HTML_EDITFORM_OUTPUT', 'BEFORE', $this, 'addLayoutField');
     }
 
     public function addLayoutField(Doku_Event $event, $param)
     {
         global $INPUT;
+        if ($event->name == 'FORM_EDIT_OUTPUT') {
+            if ($INPUT->has('tablelayout')) {
+                $event->data->setHiddenField('tablelayout', $INPUT->str('tablelayout'));
+            }
+            return;
+        }
+
         if ($event->data->_hidden['target'] !== 'table') {
             return;
         }
